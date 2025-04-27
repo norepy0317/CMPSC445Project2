@@ -1,0 +1,84 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error, r2_score
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+## Sample Data - Steel Products (base price $1000/ton)
+## Contains: base price, tariff percentage, and resulting price increase in dollars
+data = pd.DataFrame({
+    'Base_Price': [1000, 1000, 1000, 1000, 1000, 800, 800, 1200, 1200, 1500],
+    'Tariff_Percentage': [0, 10, 15, 20, 25, 10, 25, 10, 20, 15],
+    'Price_Increase_Dollars': [0, 100, 150, 200, 250, 80, 200, 120, 240, 225]
+})
+
+# Calculate the actual percentage increase for reference
+data['Actual_Pct_Increase'] = (data['Price_Increase_Dollars'] / data['Base_Price']) * 100
+
+# Feature Engineering - we'll use both base price and price increase in dollars
+X = data[['Base_Price', 'Price_Increase_Dollars']]
+y = data['Tariff_Percentage']
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Train model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Evaluate
+y_pred = model.predict(X_test)
+mae = mean_absolute_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print("Tariff Percentage Prediction Model")
+print("=================================")
+print(f"Mean Absolute Error: {mae:.2f} percentage points")
+print(f"R-squared Score: {r2:.2f}\n")
+
+## Prediction Function
+def predict_tariff(base_price, price_increase_dollars):
+    """Predict the tariff percentage given base price and dollar increase"""
+    input_data = pd.DataFrame({
+        'Base_Price': [base_price],
+        'Price_Increase_Dollars': [price_increase_dollars]
+    })
+    predicted_tariff = model.predict(input_data)[0]
+    calculated_pct = (price_increase_dollars / base_price) * 100
+    
+    print(f"Base Price: ${base_price:,.2f}")
+    print(f"Price Increase: ${price_increase_dollars:,.2f} ({calculated_pct:.1f}% increase)")
+    print(f"Predicted Tariff Percentage: {max(0, predicted_tariff):.1f}%")  # Ensure non-negative
+    return max(0, predicted_tariff)  # Return with floor at 0%
+
+## Example Predictions
+print("Example Predictions:")
+predict_tariff(1000, 200)  # $1000 base, $200 increase
+print()
+predict_tariff(750, 112.5)  # $750 base, $112.50 increase
+print()
+predict_tariff(1500, 300)  # $1500 base, $300 increase
+
+## Visualization
+plt.figure(figsize=(12, 6))
+
+# Plot 1: Relationship between dollar increase and tariff percentage
+plt.subplot(1, 2, 1)
+sns.scatterplot(x='Price_Increase_Dollars', y='Tariff_Percentage', 
+                hue='Base_Price', data=data, s=100)
+plt.title('Price Increase vs. Tariff Percentage')
+plt.xlabel('Price Increase ($)')
+plt.ylabel('Tariff Percentage')
+
+# Plot 2: Actual vs Predicted
+plt.subplot(1, 2, 2)
+sns.scatterplot(x=y_test, y=y_pred)
+plt.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], 'r--')
+plt.title('Actual vs Predicted Tariff Percentages')
+plt.xlabel('Actual Tariff (%)')
+plt.ylabel('Predicted Tariff (%)')
+
+plt.tight_layout()
+plt.show()
