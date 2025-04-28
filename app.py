@@ -82,7 +82,7 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))  
     app.run(host='0.0.0.0', port=port, debug=True)
 '''
-
+'''
 from flask import Flask, request, jsonify
 import joblib
 import numpy as np
@@ -116,3 +116,47 @@ def predict_price():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))  # Ensure it binds to the port Render provides
     app.run(host='0.0.0.0', port=port, debug=True)
+'''
+
+from flask import Flask, request, jsonify
+import joblib
+import numpy as np
+
+# Initialize Flask app
+app = Flask(__name__)
+
+# Load your trained model (make sure the .pkl file is in the same directory or provide the correct path)
+model = joblib.load('tariff_price_model.pkl')
+
+@app.route('/')
+def index():
+    return '🟢 Tariff Price Predictor API is running!'
+
+# This route handles the POST request at /predict_price
+@app.route('/predict_price', methods=['POST'])
+def predict_price():
+    try:
+        # Get the input data from the POST request
+        data = request.get_json()
+
+        # Extract values from the request data
+        tariff_percent = data.get('tariff_percent')
+        import_volume = data.get('import_volume')
+        inflation_rate = data.get('inflation_rate')
+        exchange_rate = data.get('exchange_rate')
+
+        # Prepare the input data for prediction
+        input_data = np.array([[tariff_percent, import_volume, inflation_rate, exchange_rate]])
+
+        # Make the prediction using the model
+        predicted_price = model.predict(input_data)[0]
+
+        # Return the predicted price as JSON
+        return jsonify({'predicted_price': predicted_price})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+# Run the app (Render will handle the port binding automatically)
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')
