@@ -121,9 +121,13 @@ if __name__ == '__main__':
 from flask import Flask, request, jsonify
 import joblib
 import numpy as np
+from flask_cors import CORS
+
 
 # Initialize Flask app
 app = Flask(__name__)
+CORS(app)  # This line enables CORS for all routes
+
 
 # Load your trained model (make sure the .pkl file is in the same directory or provide the correct path)
 model = joblib.load('tariff_price_model.pkl')
