@@ -43,7 +43,7 @@ if __name__ == '__main__':
 '''
 
 # app.py
-
+'''
 import os
 from flask import Flask
 import joblib
@@ -80,4 +80,39 @@ def predict_price():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))  
+    app.run(host='0.0.0.0', port=port, debug=True)
+'''
+
+from flask import Flask, request, jsonify
+import joblib
+import numpy as np
+import os
+
+app = Flask(__name__)
+
+# Load the trained model
+model = joblib.load('tariff_price_model.pkl')
+
+# Define the prediction route
+@app.route('/predict_price', methods=['POST'])
+def predict_price():
+    data = request.get_json()  # Get the input data from the POST request
+
+    # Extract the relevant input values from the request
+    tariff_percent = data['tariff_percent']
+    import_volume = data['import_volume']
+    inflation_rate = data['inflation_rate']
+    exchange_rate = data['exchange_rate']
+
+    # Convert the input values into a numpy array for prediction
+    input_data = np.array([[tariff_percent, import_volume, inflation_rate, exchange_rate]])
+
+    # Predict the product price using the model
+    predicted_price = model.predict(input_data)[0]
+
+    # Return the prediction as a JSON response
+    return jsonify({'predicted_price': predicted_price})
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))  # Ensure it binds to the port Render provides
     app.run(host='0.0.0.0', port=port, debug=True)
