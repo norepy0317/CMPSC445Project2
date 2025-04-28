@@ -1,3 +1,5 @@
+
+<!--
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -74,5 +76,73 @@
       }
     }
   </script>
+</body>
+</html>
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tariff Price Predictor</title>
+    <script>
+        function predictPrice() {
+            // Get input values from the form
+            const tariffPercent = document.getElementById('tariff_percent').value;
+            const importVolume = document.getElementById('import_volume').value;
+            const inflationRate = document.getElementById('inflation_rate').value;
+            const exchangeRate = document.getElementById('exchange_rate').value;
+
+            // Create a request object
+            const requestData = {
+                tariff_percent: parseFloat(tariffPercent),
+                import_volume: parseFloat(importVolume),
+                inflation_rate: parseFloat(inflationRate),
+                exchange_rate: parseFloat(exchangeRate)
+            };
+
+            // Send POST request to the Flask API
+            fetch('https://tariff-price.onrender.com/predict_price', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display the predicted price
+                if (data.predicted_price) {
+                    document.getElementById('result').innerText = 'Predicted Price: $' + data.predicted_price.toFixed(2);
+                } else {
+                    document.getElementById('result').innerText = 'Error: ' + data.error;
+                }
+            })
+            .catch(error => {
+                document.getElementById('result').innerText = 'Error: ' + error;
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Tariff Price Predictor</h1>
+    <form onsubmit="event.preventDefault(); predictPrice();">
+        <label for="tariff_percent">Tariff Percentage:</label>
+        <input type="number" id="tariff_percent" required><br><br>
+
+        <label for="import_volume">Import Volume (units):</label>
+        <input type="number" id="import_volume" required><br><br>
+
+        <label for="inflation_rate">Inflation Rate (%):</label>
+        <input type="number" id="inflation_rate" required><br><br>
+
+        <label for="exchange_rate">Exchange Rate:</label>
+        <input type="number" id="exchange_rate" required><br><br>
+
+        <button type="submit">Predict Price</button>
+    </form>
+
+    <h2 id="result"></h2>
 </body>
 </html>
