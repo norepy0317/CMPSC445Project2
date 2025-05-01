@@ -10,6 +10,7 @@ The code follows a logical structure for easy maintenance and scalability. At it
 
 Using the tool is straightforward and simple. Users enter two values: the base price of the steel (in dollars per ton) and the tariff percentage they want to evaluate. With a click of the "Calculate" button, the system computes and displays both the expected price increase and the new total price with the tariff. The clean, responsive interface works on any device, requiring no technical expertise. For example, entering a base price of 1,000 with a tariff of 23%, the program predicts there will be a $226.61 price increase and calculates the new price before displaying this information to the user. Additionally, to prevent errors, the user has been prevented from entering tariffs bellow 0% or base prices bellow 0%.
 ￼
+
 <img width="506" alt="Steel Price Calculator" src="https://github.com/user-attachments/assets/6aefacd0-80fb-4bec-8346-616dea410d8b" />
 
 
