@@ -1,47 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Steel Price Calculator</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <title>Steel Tariff Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .calculator-container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
-        .result-box {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
+        body { padding: 20px; }
+        .calculator-box { max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+        .result-box { margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 5px; }
     </style>
 </head>
 <body>
-    <div class="container calculator-container">
-        <h1 class="text-center mb-4">Steel Price Calculator</h1>
+    <div class="calculator-box">
+        <h2 class="text-center">Steel Price Calculator</h2>
+        
+        {% if error %}
+        <div class="alert alert-danger">Please enter valid numbers!</div>
+        {% endif %}
+        
         <form method="POST">
             <div class="mb-3">
-                <label for="base_price" class="form-label">Base Price ($/ton)</label>
-                <input type="number" step="0.01" class="form-control" id="base_price" name="base_price" required>
+                <label class="form-label">Base Price ($/ton)</label>
+                <input type="number" step="0.01" class="form-control" name="base_price" required>
             </div>
             <div class="mb-3">
-                <label for="tariff_percent" class="form-label">Tariff Percentage (%)</label>
-                <input type="number" step="0.1" class="form-control" id="tariff_percent" name="tariff_percent" required>
+                <label class="form-label">Tariff Percentage (%)</label>
+                <input type="number" step="0.1" class="form-control" name="tariff_percent" required>
             </div>
             <button type="submit" class="btn btn-primary w-100">Calculate</button>
         </form>
 
-        {% if new_price %}
-        <div class="result-box mt-4">
-            <h3>Results</h3>
-            <p><strong>Base Price:</strong> ${{ "%.2f"|format(base_price) }}/ton</p>
-            <p><strong>Tariff:</strong> {{ "%.1f"|format(tariff_percent) }}%</p>
+        {% if result %}
+        <div class="result-box">
+            <h4>Results</h4>
+            <p><strong>Base Price:</strong> ${{ base_price }}/ton</p>
+            <p><strong>Tariff:</strong> {{ tariff_percent }}%</p>
             <hr>
-            <p><strong>Price Increase:</strong> ${{ "%.2f"|format(price_increase) }}</p>
-            <h4 class="mt-3">New Price: ${{ "%.2f"|format(new_price) }}/ton</h4>
+            <p><strong>Price Increase:</strong> ${{ price_increase }}</p>
+            <h5>New Price: ${{ new_price }}/ton</h5>
         </div>
         {% endif %}
     </div>
